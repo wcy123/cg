@@ -5,10 +5,13 @@
 
 int foo(int a, int b)
 {
+    fprintf(stderr,__FILE__ ":%d:[%s] a=%d,b=%d\n", __LINE__, __FUNCTION__
+            ,a,b);
+
     for(int i = 0x1976; i < 0x1976 + a; i++){
-        fprintf(stderr,__FILE__ ":%d:[%s] i=%d\n", __LINE__, __FUNCTION__
-                ,i);
-        int x = cg_return(__builtin_frame_address(0), i);
+        fprintf(stderr,__FILE__ ":%d:[%s] i=%d a=%d\n", __LINE__, __FUNCTION__
+                ,i,a);
+        int x = cg_yield(__builtin_frame_address(0), i);
         fprintf(stderr,__FILE__ ":%d:[%s] x=%d\n", __LINE__, __FUNCTION__
                 ,x);
 

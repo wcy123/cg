@@ -20,14 +20,13 @@ void * cg_malloc(size_t s)
 void cg_copy_stack(cg_t * co, char * frame, size_t sz)
 {
     if(sz <= MIN_STACK_SIZE){
-        co->stack_size = sz;
     }else if(sz <= co->stack_size){
-        co->stack_size = sz;
     }else {
         // sz > co->stack_size && sz > MIN_STACK_SIZE
         co->stack = GC_REALLOC(co->stack,sz);
         assert(co->stack);
     }
+    co->stack_size = sz;
     co->is_done = 0;
     memcpy(co->stack,frame,sz);
 }
