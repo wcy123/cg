@@ -45,7 +45,10 @@ cg_create:
  */      
 	.globl cg_invoke
 cg_invoke:
-	push %rbp
+        cmpq $0,0x10(%rdi)    /* if this->is_done */
+        je   .L2
+        call abort
+.L2:	push %rbp
         movq %rsp, %rbp
 	push %rbx
 	push %r12
