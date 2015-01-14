@@ -1,29 +1,26 @@
         .section .text
-	.globl cg_create
-        .type cg_creat, @function
-cg_create:
+	.globl cg_init
+        .type cg_init, @function
+cg_init:
 	/*  ARG1, function entry; */
 	/*  ARG2, f arg1 */
 	/*  ARG3, f arg2 */
-	pushq %rdi        /*  save function entry */
-	pushq %rsi        /*  save arg1 */
-	pushq %rdx        /*  save arg2     */
-	movq  $0x18, %rdi   /*  $18 is sizeof(struct cg_s) */
-	callq cg_malloc    /*  allocate this */
+	pushq %rsi        /*  save function entry */
+	pushq %rdx        /*  save arg1 */
+	pushq %rcx        /*  save arg2     */
+        pushq %rdi        /*  save this */
 	/*  init stack */
-	push %rax            /*  save this */
 	movq $0x80,  %rdi     /*  alloc stack, MIN_STACK_SIZE = 0x80 */
-	call cg_malloc      /*  alloc stack */
-	popq %rdi            /*  restore this */
-	movq $0x50, 0x0(%rdi)    /*  save this->stack_size */
-	movq %rax, 0x8(%rdi)    /*  save this->stack */
-	movq $0x0, 0x10(%rdi)    /*  save this->is_done = 0 */        
-	movq %rax, %r8
-	movq %rdi, %rax 
+	call cg_malloc        /*  alloc stack */
+	popq %r8              /*  restore this */
+	movq $0x50, 0x00(%r8)    /*  save this->stack_size  */
+	movq %rax , 0x08(%r8)    /*  save this->stack       */
+	movq $0x0 , 0x10(%r8)    /*  save this->is_done = 0 */
+        movq %rax , %r8
 	/*  restore args */
-	popq %rsi /*  arg2 */
-	popq %rdi /*  arg1 */
-	popq %rdx   /*  function entry */
+	popq %rsi             /*  arg2 */
+	popq %rdi             /*  arg1 */
+	popq %rdx             /*  function entry */
 	/*  save registers */
 	movq %rdi, 0x00(%r8)
 	movq %rsi, 0x08(%r8)

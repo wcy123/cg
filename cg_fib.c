@@ -19,16 +19,16 @@ uintptr_t fib(uintptr_t limit, uintptr_t undef)
 int main(int argc, char *argv[])
 {
     const uintptr_t undef = 1976;
-    cg_t * co = cg_create((void*)fib,100,undef);
+    cg_t co; cg_init(&co,(void*)fib,100,undef);
     uintptr_t x = 0;
     uintptr_t count = 0;
-    for(x = cg_invoke(co, count++);
+    for(x = cg_invoke(&co, count++);
         x != undef;
-        x = cg_invoke(co, count++)){
+        x = cg_invoke(&co, count++)){
         fprintf(stderr,__FILE__ ":%d:[%s] %ld \n",__LINE__, __FUNCTION__,x);
 
     }
-    assert(cg_is_done(co));
+    assert(cg_is_done(&co));
     return 0;
 }
 
