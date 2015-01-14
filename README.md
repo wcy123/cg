@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
    2. after that, `cg_is_done(co)` will return `1`, otherwise, `0`.
 
 
-see [master/implementation.md]() for the detail document of the implemention.
+see [https://github.com/wcy123/cg/blob/master/implementation.md](implementation.md) for the detail document of the implemention.
 
 
 
