@@ -1,5 +1,5 @@
         .section .text
-	.globl cg_init
+        .global cg_init
         .type cg_init, @function
 cg_init:
 	/*  ARG1, function entry; */
@@ -11,7 +11,7 @@ cg_init:
         pushq %rdi        /*  save this */
 	/*  init stack */
 	movq $0x80,  %rdi     /*  alloc stack, MIN_STACK_SIZE = 0x80 */
-	call cg_malloc        /*  alloc stack */
+	call cg_malloc@PLT        /*  alloc stack */
 	popq %r8              /*  restore this */
 	movq $0x50, 0x00(%r8)    /*  save this->stack_size  */
 	movq %rax , 0x08(%r8)    /*  save this->stack       */
@@ -32,19 +32,22 @@ cg_init:
 	movq %rbp, 0x38(%r8)     /*  the fire will pops 8 regs and  */
 	movq %rdx, 0x40(%r8)     /*  return address of `generator,initially, function entry point. */
 	/*  foo stack space, initally, empty */
-	movq $cg_fire, 0x48(%r8) /*  return address of `cg_invoke`*/
+	lea (cg_fire)(%rip), %rax
+        movq %rax, 0x48(%r8) /*  return address of `cg_invoke`*/
 	retq
-/*
+                                /* .size   cg_init, .-cg_init */
+        /*
  *
  */
 /*
   -------------------------------
  */      
 	.globl cg_invoke
+        .type cg_invoke, @function
 cg_invoke:
         cmpq $0,0x10(%rdi)    /* if this->is_done */
         je   .L2
-        call abort
+        call abort@PLT
 .L2:	push %rbp
         movq %rsp, %rbp
 	push %rbx
@@ -61,7 +64,7 @@ cg_invoke:
 	/*  restore stack */
 	movq 0x8(%rdi), %rsi      /*  this->stack, read  */
 	movq %rsp, %rdi           /*  dst */
-	call memcpy
+	call memcpy@PLT
         movq %r12, %rax           /* restore the return value for cg_yield */
 cg_fire:                          
         pop %rdi
@@ -73,11 +76,13 @@ cg_fire:
 	pop %rbx
 	pop %rbp
 	retq
+        .size   cg_invoke, .-cg_invoke
 /* --------------------------
  * 
  */	
 
 	.globl cg_yield
+        .type cg_yield, @function
 cg_yield:    
         /* begin save callee saved registers, rsi and rdi*/
 	pushq %rbp
@@ -96,7 +101,7 @@ cg_yield:
 	movq  0x10(%rdi), %rdi /*  skip cg_fire, cg handler */
         movq  %rdx, %r13       /* save it */
         movq  %rsp, %rsi
-        call  cg_copy_stack
+        call  cg_copy_stack@PLT
 	addq  %r13, %rsp /* rewind the stack of the generator */
 	movq  %r12, %rax /*  restore return value of yield, passed by cg_invoke */
 cg_fire2: /* this must be inline with cg_fire */
@@ -109,4 +114,4 @@ cg_fire2: /* this must be inline with cg_fire */
 	pop %rbx
 	pop %rbp
 	retq
-
+        .size cg_yield, .-cg_yield
